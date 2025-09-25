@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Giới thiệu - Trần Tuấn Phi</title>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root{
+      --bg:#0e0e0e; --fg:#fff; --card:rgba(255,255,255,.06); --accent:#00ff90;
+    }
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto;
+      background:var(--bg); color:var(--fg); text-align:center;
+      scroll-behavior:smooth; transition:background .6s,color .6s;
+      overflow-x:hidden;
+    }
+    header{
+      height:50vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+      background:url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+      box-shadow:0 0 30px rgba(0,0,0,.7);
+    }
+    header h1{font-size:3.6rem; margin:0; text-shadow:0 0 10px rgba(0,0,0,.9)}
+    header p{opacity:0; margin:6px 0 0; font-size:1.25rem; animation:fadeUp 1s ease .4s forwards}
+    section{
+      width:min(760px,92%); margin:28px auto; background:var(--card);
+      padding:22px; border-radius:14px; box-shadow:0 0 16px rgba(255,255,255,.05); text-align:left;
+      transition:background .6s;
+    }
+    h2{font-size:1.9rem; margin:0 0 16px; padding-bottom:10px;
+       border-bottom:2px solid #555; opacity:0; transform:translateY(16px); transition:all .7s ease;}
+    ul{list-style:none; padding:0; margin:0; font-size:1.22rem; line-height:1.9}
+    li{display:flex; align-items:center; gap:10px; opacity:0; transform:translateY(16px); transition:all .7s ease;}
+    li i{color:var(--accent); width:20px; text-align:center}
+    .text-slot{display:inline-block; min-height:1em}
+    a.social{display:inline-flex; align-items:center; gap:8px; margin-top:14px; font-weight:600; color:#3b5998; text-decoration:none}
+    a.social:hover{color:#6d84b4}
+
+    .code-wrap{position:relative}
+    pre{
+      background:#1e1e1e; color:#00ff90; font-family:ui-monospace,Consolas,monospace; font-size:.85rem;
+      padding:18px; border-radius:12px; min-height:220px; white-space:pre-wrap; overflow-x:auto;
+      opacity:0; transform:translateY(16px); transition:all .7s ease; box-shadow:0 0 12px rgba(0,255,144,.25);
+    }
+    .copy-btn{
+      position:absolute; right:10px; top:10px; border:0; padding:6px 12px; border-radius:8px;
+      background:rgba(0,255,144,.2); color:var(--accent); cursor:pointer; font-weight:600;
+      transition:background .25s, transform .25s;
+    }
+    .copy-btn:hover{background:rgba(0,255,144,.38); transform:scale(1.05)}
+
+    .guide{margin-top:12px; background:rgba(255,255,255,.05); padding:14px; border-radius:10px; font-size:.95rem;
+      opacity:0; transform:translateY(16px); transition:all .7s ease;}
+
+    /* Nút chức năng */
+    .controls{
+      position:fixed; bottom:20px; right:20px; display:flex; flex-direction:column; gap:10px; z-index:5;
+    }
+    .ctrl-btn{
+      background:rgba(255,255,255,0.1); color:var(--fg);
+      border:1px solid rgba(255,255,255,.3); border-radius:10px;
+      padding:10px; font-size:1.2rem; cursor:pointer;
+      backdrop-filter:blur(6px);
+      transition:background .4s,transform .3s,color .4s;
+    }
+    .ctrl-btn:hover{background:rgba(255,255,255,.3); transform:scale(1.1)}
+
+    .visible{opacity:1 !important; transform:translateY(0) !important}
+    @keyframes fadeUp{from{opacity:0; transform:translateY(18px)} to{opacity:1; transform:translateY(0)}}
+
+    canvas#fallingCanvas{
+      position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none;
+      z-index:1;
+      transition:opacity 0.6s;
+    }
+    header,section,footer{position:relative; z-index:2}
+  </style>
+</head>
+<body>
+  <canvas id="fallingCanvas"></canvas>
+
+  <!-- Nút điều khiển -->
+  <div class="controls">
+    <button class="ctrl-btn" id="toggleEffect"><i class="fa-solid fa-pause"></i></button>
+    <button class="ctrl-btn" id="switchEffect"><i class="fa-solid fa-seedling"></i></button>
+    <button class="ctrl-btn" id="toggleTheme"><i class="fa-solid fa-moon"></i></button>
+  </div>
+
+  <header>
+    <h1>Trần Tuấn Phi</h1>
+    <p>Lập trình • Cây cỏ • Hoa lá</p>
+  </header>
+
+  <section>
+    <h2 class="reveal">Giới thiệu</h2>
+    <ul>
+      <li class="reveal typing" data-text="Tên: Trần Tuấn Phi">
+        <i class="fa-solid fa-user"></i><span class="text-slot"></span>
+      </li>
+      <li class="reveal typing" data-text="Sở thích: Code, cây, cỏ, hoa, lá">
+        <i class="fa-solid fa-heart"></i><span class="text-slot"></span>
+      </li>
+      <li class="reveal typing" data-text="Email: phihhhhhhhhhh@gmail.com">
+        <i class="fa-solid fa-envelope"></i><span class="text-slot"></span>
+      </li>
+    </ul>
+    <a class="social reveal" href="https://www.facebook.com/share/1PB6MyWcrk/" target="_blank" rel="noopener">
+      <i class="fa-brands fa-facebook"></i> Facebook của tôi
+    </a>
+  </section>
+
+  <section>
+    <h2 class="reveal">Mã nguồn trang</h2>
+    <div class="code-wrap">
+      <pre id="code-block" class="reveal"></pre>
+      <button class="copy-btn" id="copy-btn"><i class="fa-solid fa-copy"></i> Copy</button>
+    </div>
+    <div class="guide reveal">
+      <b>Hướng dẫn chỉnh sửa nhanh:</b><br/>
+      • Ảnh bìa: sửa URL trong <code>header{ background:url(...) }</code><br/>
+      • Tên/Sở thích/Email: đổi nội dung ở <code>data-text</code><br/>
+      • Màu nhấn: đổi biến <code>--accent</code><br/>
+      • Thêm mạng xã hội: thêm thẻ <code>&lt;a class="social"&gt;</code>
+    </div>
+  </section>
+
+  <footer style="text-align:center; color:#aaa; padding:16px 0; margin:20px 0 6px">
+    © 2025 - Trang cá nhân được tạo bởi Trần Tuấn Phi
+  </footer>
+
+  <script>
+    /* IntersectionObserver cho reveal */
+    const io=new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(!e.isIntersecting)return;
+        const el=e.target;
+        el.classList.add('visible');
+        if(el.classList.contains('typing') && !el.dataset.done){
+          el.dataset.done='1';
+          const target=el.querySelector('.text-slot');
+          const txt=el.dataset.text;
+          let i=0;
+          (function type(){
+            if(i<=txt.length){target.textContent=txt.slice(0,i++); setTimeout(type,45);}
+          })();
+        }
+        if(el.id==="code-block" && !el.dataset.done){
+          el.dataset.done='1'; typeWholeSource(el);
+        }
+        io.unobserve(el);
+      });
+    },{threshold:0.15});
+    document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+    const PAGE_SOURCE='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+    function typeWholeSource(pre){
+      let i=0;(function t(){if(i<PAGE_SOURCE.length){pre.textContent+=PAGE_SOURCE.charAt(i++); setTimeout(t,2);} })();
+    }
+    document.getElementById('copy-btn').addEventListener('click',()=>{
+      navigator.clipboard.writeText(PAGE_SOURCE).then(()=>{
+        const btn=document.getElementById('copy-btn');
+        const old=btn.innerHTML;
+        btn.innerHTML='<i class="fa-solid fa-check"></i> Copied!';
+        setTimeout(()=>btn.innerHTML=old,1200);
+      });
+    });
+
+    /* Hiệu ứng rơi */
+    const canvas=document.getElementById('fallingCanvas');
+    const ctx=canvas.getContext('2d');
+    let particles=[]; let running=true; let mode='sakura';
+    function resize(){canvas.width=innerWidth; canvas.height=innerHeight;}
+    window.addEventListener('resize',resize); resize();
+    function createParticles(){
+      particles=[];
+      for(let i=0;i<25;i++){
+        particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,
+                        r:6+Math.random()*6,speed:1+Math.random()*2,drift:Math.random()*2});
+      }
+    } createParticles();
+    function draw(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      particles.forEach(p=>{
+        ctx.beginPath();
+        ctx.fillStyle=(mode==='sakura')?'rgba(255,182,193,0.85)':'rgba(34,139,34,0.85)';
+        ctx.ellipse(p.x,p.y,p.r,p.r/1.5,0,0,Math.PI*2);
+        ctx.fill();
+        p.y+=p.speed; p.x+=Math.sin(p.y/30)*p.drift;
+        if(p.y>canvas.height){p.y=-10;p.x=Math.random()*canvas.width;}
+      });
+      if(running) requestAnimationFrame(draw);
+    }
+    draw();
+
+    /* Nút điều khiển */
+    const toggleEffect=document.getElementById('toggleEffect');
+    toggleEffect.addEventListener('click',()=>{
+      running=!running;
+      toggleEffect.innerHTML=running?'<i class="fa-solid fa-pause"></i>':'<i class="fa-solid fa-play"></i>';
+      if(running){draw(); canvas.style.opacity=1;} else {canvas.style.opacity=0;}
+    });
+
+    const switchEffect=document.getElementById('switchEffect');
+    switchEffect.addEventListener('click',()=>{
+      mode=(mode==='sakura')?'leaf':'sakura';
+      switchEffect.innerHTML=mode==='sakura'
+        ?'<i class="fa-solid fa-seedling"></i>'
+        :'<i class="fa-solid fa-spa"></i>';
+    });
+
+    const toggleTheme=document.getElementById('toggleTheme');
+    toggleTheme.addEventListener('click',()=>{
+      document.body.classList.toggle('light-mode');
+      if(document.body.classList.contains('light-mode')){
+        document.documentElement.style.setProperty('--bg','#f5f5f5');
+        document.documentElement.style.setProperty('--fg','#222');
+        document.documentElement.style.setProperty('--card','rgba(0,0,0,0.05)');
+        toggleTheme.innerHTML='<i class="fa-solid fa-moon"></i>';
+      } else {
+        document.documentElement.style.setProperty('--bg','#0e0e0e');
+        document.documentElement.style.setProperty('--fg','#fff');
+        document.documentElement.style.setProperty('--card','rgba(255,255,255,0.06)');
+        toggleTheme.innerHTML='<i class="fa-solid fa-sun"></i>';
+      }
+    });
+  </script>
+</body>
+</html>
