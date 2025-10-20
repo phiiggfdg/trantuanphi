@@ -1,28 +1,23 @@
 <!doctype html>
 <html lang="vi">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Tran Phi — Cosmic Chill V13 (Earthlight Orbit)</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Tran Phi — Cosmic Chill V14 (Earthlight Gyro Orbit)</title>
 <style>
   html,body{margin:0;height:100%;overflow:hidden;background:#060312;color:#fff;font-family:system-ui,Segoe UI,Roboto,Arial}
-  .ui{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none}
+  #gl{position:fixed;inset:0;display:block}
+  #sun{position:fixed;inset:0;display:block;pointer-events:none;z-index:3}
+  .ui{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;z-index:4}
   h1{margin:0;font-size:clamp(36px,7vw,84px);letter-spacing:.4px;opacity:.95;
-     text-shadow:0 0 20px rgba(106,0,255,.45),0 0 40px rgba(0,175,255,.20)}
+     text-shadow:0 0 20px rgba(106,0,255,.45),0 0 40px rgba(0,175,255,.2)}
   p{margin:.4rem 0 0;color:#cfe3ffcc}
-  .links{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:10px;pointer-events:auto}
+  .links{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:10px;pointer-events:auto;z-index:4}
   .btn{padding:10px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.18);color:#fff;text-decoration:none;
        background:rgba(255,255,255,.06);transition:.25s}
   .btn:hover{background:linear-gradient(90deg,#6a00ff,#00afff,#ffb6e9);border-color:transparent}
-  .hint{position:fixed;left:12px;bottom:10px;color:#9fb0ff80;font-size:12px}
-  #sun {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 3;
-}
+  .hint{position:fixed;left:12px;bottom:10px;color:#9fb0ff80;font-size:12px;z-index:4}
 </style>
-
 </head>
 <body>
 <canvas id="gl"></canvas>
@@ -38,7 +33,7 @@
   <a class="btn" href="https://www.facebook.com/share/1G2ggLr4KV/" target="_blank" rel="noopener">Facebook</a>
   <a class="btn" href="https://www.tiktok.com/@phitran111e?_t=ZS-90iLGVfBWBI&_r=1" target="_blank" rel="noopener">TikTok</a>
 </div>
-<div class="hint">Di chuột để lia, lăn chuột để dolly • V13: Earthlight Orbit</div>
+<div class="hint">PC: lia chuột / cuộn để dolly • Mobile: nghiêng máy để xoay • V14</div>
 
 <script>
 (function(){
@@ -46,15 +41,16 @@
   const gl = canvas.getContext('webgl', {antialias:true, alpha:false, premultipliedAlpha:false});
   if(!gl){ alert('WebGL không khả dụng'); return; }
 
-  /* ====== resize ====== */
-  function resize(){
+  /* ===== helpers ===== */
+  function resizeGL(){
     const dpr = Math.min(2, window.devicePixelRatio||1);
     const w = Math.floor(innerWidth*dpr), h = Math.floor(innerHeight*dpr);
-    if(canvas.width!==w || canvas.height!==h){ canvas.width=w; canvas.height=h; gl.viewport(0,0,w,h); }
+    if(canvas.width!==w || canvas.height!==h){
+      canvas.width=w; canvas.height=h; gl.viewport(0,0,w,h);
+    }
   }
-  resize(); addEventListener('resize', resize);
+  resizeGL(); addEventListener('resize', resizeGL);
 
-  /* ====== tiny mat ====== */
   const I=()=>[1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1];
   const M=(a,b)=>{const o=new Array(16);for(let r=0;r<4;r++)for(let c=0;c<4;c++)o[r*4+c]=a[r*4+0]*b[c+0]+a[r*4+1]*b[c+4]+a[r*4+2]*b[c+8]+a[r*4+3]*b[c+12];return o;}
   const P=(fov,asp,n,f)=>{const t=1/Math.tan(fov/2),nf=1/(n-f);return[t/asp,0,0,0, 0,t,0,0, 0,0,(f+n)*nf,-1, 0,0,(2*f*n)*nf,0];}
@@ -63,13 +59,12 @@
   const RZ=a=>{const c=Math.cos(a),s=Math.sin(a);return[c,s,0,0, -s,c,0,0, 0,0,1,0, 0,0,0,1];};
   const T=(x,y,z)=>{const m=I();m[12]=x;m[13]=y;m[14]=z;return m;}
 
-  /* ====== compile/link ====== */
   function compile(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);
     if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){console.error(gl.getShaderInfoLog(s));throw Error('shader');}return s;}
   function link(vs,fs){const p=gl.createProgram();gl.attachShader(p,compile(gl.VERTEX_SHADER,vs));gl.attachShader(p,compile(gl.FRAGMENT_SHADER,fs));gl.linkProgram(p);
     if(!gl.getProgramParameter(p,gl.LINK_STATUS)){console.error(gl.getProgramInfoLog(p));throw Error('program');}return p;}
 
-  /* ====== Nebula background (deep) ====== */
+  /* ===== Nebula ===== */
   const nebVS=`attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}`;
   const nebFS=`precision highp float;uniform vec2 r;uniform float t;
     float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
@@ -87,18 +82,16 @@
   gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]),gl.STATIC_DRAW);
   const nebAL=gl.getAttribLocation(nebP,'a'), nebRL=gl.getUniformLocation(nebP,'r'), nebTL=gl.getUniformLocation(nebP,'t');
 
-  /* ====== Points program (stars / galaxy / meteors) ====== */
+  /* ===== Points (stars/galaxy/meteors) ===== */
   const ptVS=`attribute vec3 p;attribute float s;attribute vec3 c;uniform mat4 pr,vi,mo;varying vec3 vc;
-  void main(){vc=c;gl_Position=pr*vi*mo*vec4(p,1.);gl_PointSize=s;}`;
-  const ptFS=`precision mediump float;varying vec3 vc;
-  void main(){vec2 uv=gl_PointCoord*2.-1.;float d=dot(uv,uv);float a=smoothstep(1.,0.,d);gl_FragColor=vec4(vc,a);}`;
+    void main(){vc=c;gl_Position=pr*vi*mo*vec4(p,1.);gl_PointSize=s;}`;
+  const ptFS=`precision mediump float;varying vec3 vc;void main(){vec2 uv=gl_PointCoord*2.-1.;float a=smoothstep(1.,0.,dot(uv,uv));gl_FragColor=vec4(vc,a);}`;
   const ptP=link(ptVS,ptFS);
   const aPos=gl.getAttribLocation(ptP,'p'), aSize=gl.getAttribLocation(ptP,'s'), aCol=gl.getAttribLocation(ptP,'c');
   const uPr=gl.getUniformLocation(ptP,'pr'), uVi=gl.getUniformLocation(ptP,'vi'), uMo=gl.getUniformLocation(ptP,'mo');
   function mkBuf(n){return{pos:gl.createBuffer(),col:gl.createBuffer(),siz:gl.createBuffer(),count:n};}
   function fill(buf,arr,nc,loc){gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,arr,gl.DYNAMIC_DRAW);gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,nc,gl.FLOAT,false,0,0);}
 
-  // stars deep layers
   function starLayer(n,spread,size,tint){const pos=new Float32Array(n*3),col=new Float32Array(n*3),siz=new Float32Array(n);
     for(let i=0;i<n;i++){const ix=i*3;
       pos[ix]=(Math.random()-.5)*spread; pos[ix+1]=(Math.random()-.5)*spread*.6; pos[ix+2]=(Math.random()-.5)*spread;
@@ -109,38 +102,32 @@
   const starsMid = starLayer(2000,1100,2.6,[0.84,0.78,1.00]);
   const starsNear= starLayer(1000, 800,3.2,[1.00,0.72,0.91]);
 
-  // spiral galaxy (background)
-  function spiral(n=3400,radius=140,arms=3,spin=1.6,thick=7){
+  function spiral(n=3600,radius=160,arms=4,spin=1.4,thick=5){
     const pos=new Float32Array(n*3),col=new Float32Array(n*3),siz=new Float32Array(n);
     for(let i=0;i<n;i++){const ix=i*3; const arm=Math.floor(Math.random()*arms);
       const r=Math.pow(Math.random(),0.35)*radius; const base=arm*(2*Math.PI/arms);
-      const ang=base+r*spin+(Math.random()-.5)*.4; const y=(Math.random()-.5)*thick*Math.pow(1-r/radius,0.5);
+      const ang=base+r*spin+(Math.random()-.5)*.35; const y=(Math.random()-.5)*thick*Math.pow(1-r/radius,0.5);
       pos[ix]=Math.cos(ang)*r; pos[ix+1]=y; pos[ix+2]=Math.sin(ang)*r;
       const p=[0.84,0.78,1.0], c=[0.68,0.91,1.0], h=[1.00,0.72,0.91];
       const m1=Math.random()*0.5, m2=Math.random()*0.25;
       let rr=(1-m1)*1+m1*p[0]; rr=(1-m2)*rr+m2*h[0];
       let gg=(1-m1)*1+m1*p[1]; gg=(1-m2)*gg+m2*h[1];
       let bb=(1-m1)*1+m1*p[2]; bb=(1-m2)*bb+m2*h[2];
-      col[ix]=rr*.9; col[ix+1]=gg*.9; col[ix+2]=bb*.9;
-      siz[i]=1.7;
+      col[ix]=rr*.9; col[ix+1]=gg*.9; col[ix+2]=bb*.9; siz[i]=2.1;
     }
     const b=mkBuf(n); b._pos=pos; b._col=col; b._siz=siz; b.count=n; b._tilt=62*Math.PI/180; return b;
   }
   const bgGalaxy = spiral();
 
-  // meteors (slow, long tail)
+  // meteors (slow)
   const MET_TAIL=80, MAX_MET=3; const mPos=new Float32Array(MET_TAIL*MAX_MET*3), mCol=new Float32Array(MET_TAIL*MAX_MET*3), mSize=new Float32Array(MET_TAIL*MAX_MET);
   const meteors=mkBuf(MET_TAIL*MAX_MET); let act=[];
-  function spawnMeteor(){
-    if(act.length>=MAX_MET) return;
-    const side=Math.random()<0.5?-1:1;
-    const x= side*(120+Math.random()*40), y=(Math.random()-.5)*60, z=-120-Math.random()*40;
+  function spawnMeteor(){ if(act.length>=MAX_MET) return;
+    const side=Math.random()<0.5?-1:1; const x= side*(120+Math.random()*40), y=(Math.random()-.5)*60, z=-120-Math.random()*40;
     const sp=0.28+Math.random()*0.18, vx=-side*sp, vy=(Math.random()-.5)*0.06, vz=(0.65+Math.random()*0.2)*sp;
-    act.push({x,y,z,vx,vy,vz,life:0,ttl:6+Math.random()*6});
-  }
+    act.push({x,y,z,vx,vy,vz,life:0,ttl:6+Math.random()*6}); }
   spawnMeteor();
 
-  // upload static once
   [starsFar,starsMid,starsNear,bgGalaxy].forEach(b=>{
     b.pos=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,b.pos); gl.bufferData(gl.ARRAY_BUFFER,b._pos,gl.STATIC_DRAW);
     b.col=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,b.col); gl.bufferData(gl.ARRAY_BUFFER,b._col,gl.STATIC_DRAW);
@@ -148,96 +135,37 @@
   });
   meteors.pos=gl.createBuffer(); meteors.col=gl.createBuffer(); meteors.siz=gl.createBuffer();
 
-
-  /* ====== EARTH (real-ish) — full-screen shader that draws a sphere ====== */
+  /* ===== Earth full-screen raymarch (real-ish) ===== */
   const earthVS=`attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}`;
   const earthFS=`precision highp float;
     uniform vec2 r; uniform float t; uniform vec2 cam; uniform float zoom;
-    // light from top-right (warm)
-	const vec3 sunPos = vec3(2.5, 1.8, 3.0);
-	vec3 L = normalize(sunPos);  // thay cho lightDir
-    const vec3 lightDir = normalize(vec3(1.2, 0.8, 0.4));
-    // hash/noise/fbm to fake continents & clouds
+    const vec3 sunDir = normalize(vec3(1.2, 0.8, 0.4)); // góc phải-trên, dịu
     float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
     float n2(vec2 p){vec2 i=floor(p),f=fract(p);float a=h(i),b=h(i+vec2(1,0)),c=h(i+vec2(0,1)),d=h(i+vec2(1,1));
       vec2 u=f*f*(3.-2.*f);return mix(a,b,u.x)+(c-a)*u.y*(1.-u.x)+(d-b)*u.x*u.y;}
     float fbm(vec2 p){float v=0.,A=.5;for(int i=0;i<5;i++){v+=A*n2(p);p*=2.;A*=.55;}return v;}
-
-    // rotate around Y
     mat3 rotY(float a){float c=cos(a),s=sin(a);return mat3(c,0.,-s, 0.,1.,0., s,0.,c);}
-
     void main(){
-      vec2 uv = (gl_FragCoord.xy/r) - .5;
-      uv.x *= r.x/r.y;
-
-      // camera parallax & zoom
-      uv -= cam*0.08;
-      float scale = mix(1.0, 0.88, clamp(zoom/14.0, 0.0, 1.0));
-      uv *= scale;
-
-      // sphere setup
-      vec3 ro = vec3(0., 0., 3.5);          // camera
-      vec3 rd = normalize(vec3(uv, -1.5));  // ray
-      float R = 0.6;                        // earth radius
-      // intersect ray-sphere (center at origin)
-      float b = dot(ro, rd);
-      float c = dot(ro, ro) - R*R;
-      float h2 = b*b - c;
-      if(h2 < 0.0){ discard; }              // miss the sphere
-      float t0 = -b - sqrt(max(0.0,h2));    // nearest hit
-      vec3 pos = ro + rd * t0;              // hit point in world
-      vec3 N = normalize(pos);              // normal
-
-      // spin earth (slow)
-      float spin = t*0.12;                  // 1B: chậm vừa
-      N = rotY(spin) * N;
-
-      // lat/long for continents procedural
-      float lon = atan(N.z, N.x);           // [-pi, pi]
-      float lat = asin(N.y);                // [-pi/2, pi/2]
-      vec2 st = vec2(lon/3.14159, lat/1.5708);  // [-1..1]
-      // continents: threshold fbm to get land vs ocean
-      float cont = fbm(st*2.4 + vec2(0.0, t*0.02));
-      float land = smoothstep(0.52, 0.60, cont); // land mask
-      // clouds (soft, moving)
-      float clouds = smoothstep(0.58, 0.80, fbm(st*6.0 + vec2(t*0.05, -t*0.03)));
-
-      // base colors
-      vec3 ocean = vec3(0.05, 0.25, 0.65);
-      vec3 shallow = vec3(0.08, 0.45, 0.85);
-      vec3 ground = vec3(0.22, 0.42, 0.15);
-      vec3 sand   = vec3(0.70, 0.62, 0.35);
-
-      vec3 base = mix(ocean, shallow, smoothstep(0.0, 0.25, fbm(st*3.0))); // ocean variation
+      vec2 uv=(gl_FragCoord.xy/r)-.5; uv.x*=r.x/r.y; uv-=cam*0.08;
+      float scale = mix(1.0, 0.88, clamp(zoom/14.0, 0.0, 1.0)); uv*=scale;
+      vec3 ro=vec3(0.,0.,3.5); vec3 rd=normalize(vec3(uv,-1.2)); float R=0.7;
+      float b=dot(ro,rd), c=dot(ro,ro)-R*R, h2=b*b-c; if(h2<0.0){discard;}
+      float t0=-b-sqrt(max(0.0,h2)); vec3 pos=ro+rd*t0; vec3 N=normalize(pos); N=rotY(t*0.12)*N;
+      float lon=atan(N.z,N.x), lat=asin(N.y); vec2 st=vec2(lon/3.14159, lat/1.5708);
+      float cont=fbm(st*2.4+vec2(0., t*0.02)); float land=smoothstep(0.52,0.60,cont);
+      float clouds=smoothstep(0.58,0.80,fbm(st*6.0+vec2(t*0.05,-t*0.03)));
+      vec3 ocean=vec3(0.05,0.25,0.65), shallow=vec3(0.08,0.45,0.85), ground=vec3(0.22,0.42,0.15), sand=vec3(0.70,0.62,0.35);
+      vec3 base=mix(ocean,shallow,smoothstep(0.0,0.25,fbm(st*3.0)));
       base = mix(base, mix(ground, sand, fbm(st*5.0)), land);
-
-      // lighting (sun warm – from top-right)
-      vec3 L = normalize(lightDir);
-      float diff = max(dot(N, L), 0.0);
-      // warm sunlight color
-      vec3 sunCol = vec3(0.95, 0.8, 0.55);
-      // ambient deep space
-      vec3 ambCol = vec3(0.06, 0.09, 0.16);
-
-      // rim light (atmospheric)
-      float rim = pow(1.0 - max(dot(N, -rd), 0.0), 2.2);
-      vec3 rimCol = vec3(0.45, 0.35, 1.0) * rim * 0.7;
-
-      // clouds on top, lit by sun
-      vec3 cloudCol = vec3(1.0) * (0.4 + 0.6*diff);
-      base = mix(base, cloudCol, clouds*0.55);
-
-      vec3 col = base * (ambCol + sunCol * diff * 0.85) + rimCol;
-
-      // night side subtle city glow (very faint, warm)
-      float night = smoothstep(0.15, 0.0, diff);
-      col += night * vec3(0.9, 0.65, 0.2) * 0.05 * fbm(st*10.0);
-
-      // slight vignette toward edge of sphere
-      float edge = smoothstep(R*R, R*R*0.92, dot(pos,pos));
-      col *= mix(1.0, 0.85, edge);
-
-      gl_FragColor = vec4(col, 1.0);
+      base = mix(base, mix(ground, sand, fbm(st*5.0)), land);
+      vec3 L=normalize(sunDir); float diff=max(dot(N,L),0.0);
+      vec3 sunCol=vec3(0.95,0.80,0.55), amb=vec3(0.06,0.09,0.16);
+      float rim=pow(1.0-max(dot(N,-rd),0.0),2.2); vec3 rimCol=vec3(0.45,0.35,1.0)*rim*0.7;
+      vec3 cloudCol=vec3(1.0)*(0.4+0.6*diff); base=mix(base,cloudCol,clouds*0.55);
+      vec3 col=base*(amb+sunCol*diff*0.85)+rimCol;
+      float night=smoothstep(0.15,0.0,diff); col+=night*vec3(0.9,0.65,0.2)*0.05*fbm(st*10.0);
+      float edge=smoothstep(R*R,R*R*0.92,dot(pos,pos)); col*=mix(1.0,0.86,edge);
+      gl_FragColor=vec4(col,1.0);
     }`;
   const earthP=link(earthVS,earthFS);
   const eB=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,eB);
@@ -248,7 +176,61 @@
   const eCam=gl.getUniformLocation(earthP,'cam');
   const eZoom=gl.getUniformLocation(earthP,'zoom');
 
-  /* ====== helpers ====== */
+  /* ===== interaction (mouse + gyro) ===== */
+  let proj=P(Math.PI/3, canvas.width/canvas.height, 0.1, 5000);
+  addEventListener('resize',()=>{
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+
+    // Nếu là điện thoại, lùi camera xa hơn & thu góc nhìn
+    if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+      proj = P(Math.PI/4.2, canvas.width / canvas.height, 0.1, 8000);
+    } else {
+      proj = P(Math.PI/3.5, canvas.width / canvas.height, 0.1, 5000);
+    }
+  });
+
+  const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+  let mx=0,my=0, targetX=0, targetY=0, scrollZ=0;
+  addEventListener('mousemove',e=>{ if(!isMobile){ targetX=(e.clientX/innerWidth)*2-1; targetY=(e.clientY/innerHeight)*2-1; } },{passive:true});
+  addEventListener('wheel',e=>{ scrollZ += e.deltaY*0.0015; scrollZ=Math.max(-2,Math.min(12,scrollZ)); },{passive:true});
+
+  // Gyro (2B: chậm mượt) + iOS permission
+  let gyroX=0, gyroY=0, gOK=false;
+  function enableGyro(){
+    try{
+      if(typeof DeviceOrientationEvent!=="undefined" && typeof DeviceOrientationEvent.requestPermission==="function"){
+        DeviceOrientationEvent.requestPermission().then(state=>{
+          if(state==="granted"){window.addEventListener("deviceorientation",e=>{gyroX=e.beta||0; gyroY=e.gamma||0; gOK=true;});}
+        }).catch(()=>{});
+      }else{
+        window.addEventListener("deviceorientation",e=>{gyroX=e.beta||0; gyroY=e.gamma||0; gOK=true;});
+      }
+    }catch(_){}
+  }
+  if(isMobile) enableGyro();
+
+  /* ===== Sun overlay (soft) ===== */
+  const sunCanvas = document.getElementById('sun');
+  const sunCtx = sunCanvas.getContext('2d');
+  function drawSun(){
+    sunCanvas.width = innerWidth; sunCanvas.height = innerHeight;
+    sunCtx.clearRect(0,0,sunCanvas.width,sunCanvas.height);
+    const sunX = sunCanvas.width * 0.90;
+    const sunY = sunCanvas.height * 0.16;
+    const R = Math.min(sunCanvas.width, sunCanvas.height) * 0.14; // 1B: dịu
+    const g = sunCtx.createRadialGradient(sunX, sunY, 0, sunX, sunY, R);
+    g.addColorStop(0,"rgba(242,210,150,1)");
+    g.addColorStop(0.45,"rgba(242,190,120,0.55)");
+    g.addColorStop(1,"rgba(240,160,90,0)");
+    sunCtx.globalCompositeOperation="lighter";
+    sunCtx.fillStyle=g;
+    sunCtx.fillRect(0,0,sunCanvas.width,sunCanvas.height);
+    sunCtx.globalCompositeOperation="source-over";
+  }
+  drawSun();
+
+  /* ===== render ===== */
   function drawPoints(buf, view, model){
     gl.useProgram(ptP);
     gl.uniformMatrix4fv(uPr,false,proj);
@@ -260,56 +242,51 @@
     gl.drawArrays(gl.POINTS,0,buf.count);
   }
 
-  /* ====== camera / interact ====== */
-  let proj=P(Math.PI/3, canvas.width/canvas.height, 0.1, 4000);
-  window.dispatchEvent(new Event('resize'));
-  addEventListener('resize', ()=>{ resize(); proj=P(Math.PI/3.5, canvas.width/canvas.height, 0.1, 5000); });
-  const target={x:0,y:0}; let scrollZ=0;
-  addEventListener('mousemove',e=>{target.x=(e.clientX/innerWidth)*2-1;target.y=(e.clientY/innerHeight)*2-1;},{passive:true});
-  addEventListener('wheel',e=>{scrollZ+=e.deltaY*0.0015;scrollZ=Math.max(-2,Math.min(12,scrollZ));},{passive:true});
-
-  // upload star / galaxy buffers once
-  [starsFar,starsMid,starsNear,bgGalaxy].forEach(b=>{
-    // already filled above
-  });
-  meteors.pos=gl.createBuffer(); meteors.col=gl.createBuffer(); meteors.siz=gl.createBuffer();
-
-  /* ====== loop ====== */
   let camX=0, camY=0, camZ=54, t=0, spawnT=0;
-  gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE); // additive for glow points
+  gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+
   function render(){
     t+=0.016; spawnT+=0.016;
 
-    // 1) Deep nebula
+    // Nebula
     gl.useProgram(nebP);
     gl.bindBuffer(gl.ARRAY_BUFFER,nebB); gl.enableVertexAttribArray(nebAL); gl.vertexAttribPointer(nebAL,2,gl.FLOAT,false,0,0);
     gl.uniform2f(nebRL,canvas.width,canvas.height); gl.uniform1f(nebTL,t);
     gl.drawArrays(gl.TRIANGLES,0,6);
 
-    // camera parallax
-    camX+=(target.x*2.0 - camX)*0.06;
-    camY+=(-(target.y)*1.6 - camY)*0.06;
-    camZ+=(54+scrollZ - camZ)*0.08;
-    const view=T(-camX,-camY,-camZ);
+    // target from mouse
+    if(!isMobile){ mx += (targetX - mx)*0.06; my += (-(targetY) - my)*0.06; }
+    // or from gyro (2B: chậm-mượt, có smoothing)
+    if(isMobile && gOK){
+      const gx = (gyroX||0)/90;  // -1..1
+      const gy = (gyroY||0)/90;
+      mx += (gy - mx)*0.04;      // chậm mượt
+      my += (gx - my)*0.04;
+    }
 
-    // 2) background stars + spiral (behind Earth)
+    camZ += (54+scrollZ - camZ)*0.08;
+    camX += (mx*2.0 - camX)*0.06;
+    camY += (my*1.6 - camY)*0.06;
+    const view = T(-camX,-camY,-camZ);
+
+    // Stars + Galaxy (deep)
     const mFar=RY(t*0.015), mMid=RY(t*0.035), mNear=RY(t*0.07);
-    let mBG=RY(t*0.015); mBG=M(RZ(0.00012*t*60),mBG); mBG=M(RX(62*Math.PI/180),mBG);
+    let mBG=RY(t*0.02); mBG=M(RZ(0.00012*t*60),mBG); mBG=M(RX(32*Math.PI/180),mBG);
     drawPoints(starsFar, view, mFar);
     drawPoints(starsMid, view, mMid);
     drawPoints(starsNear, view, mNear);
     drawPoints(bgGalaxy, view, mBG);
 
-    // 3) EARTH (drawn in screen space with correct light)
+    // Earth
     gl.useProgram(earthP);
     gl.bindBuffer(gl.ARRAY_BUFFER,eB); gl.enableVertexAttribArray(eAL); gl.vertexAttribPointer(eAL,2,gl.FLOAT,false,0,0);
     gl.uniform2f(eRes, canvas.width, canvas.height);
     gl.uniform1f(eTime, t);
-    gl.uniform2f(eCam, camX*0.06, camY*0.05); // parallax nhẹ
+    gl.uniform2f(eCam, camX*0.06, -camY*0.05);
     gl.uniform1f(eZoom, camZ-54.0);
     gl.drawArrays(gl.TRIANGLES,0,6);
 
-    // 4) Meteors (front-most)
+    // Meteors (front)
     if(spawnT > (5 + Math.random()*7)){ spawnT=0; spawnMeteor(); }
     let idx=0; const warmH=[1.0,0.9,0.7], warmT=[1.0,0.55,0.2];
     for(let m=0;m<act.length;m++){
@@ -330,53 +307,16 @@
     }
     meteors.count=idx; meteors._dynPos=mPos.subarray(0,idx*3); meteors._dynCol=mCol.subarray(0,idx*3); meteors._dynSize=mSize.subarray(0,idx);
     drawPoints(meteors, view, I());
-    // === Mặt trời overlay ===
-    const sunCanvas = document.getElementById('sun');
-    const sunCtx = sunCanvas.getContext('2d');
-
-    function drawSun(){
-      sunCanvas.width = innerWidth;
-      sunCanvas.height = innerHeight;
-      sunCtx.clearRect(0,0,sunCanvas.width,sunCanvas.height);
-      const sunX = sunCanvas.width * 0.88;
-      const sunY = sunCanvas.height * 0.15;
-      const g = sunCtx.createRadialGradient(sunX,sunY,0,sunX,sunY,120);
-      g.addColorStop(0,"rgba(255,220,120,1)");
-      g.addColorStop(0.5,"rgba(255,180,80,0.6)");
-      g.addColorStop(1,"rgba(255,150,50,0)");
-      sunCtx.fillStyle = g;
-      sunCtx.fillRect(0,0,sunCanvas.width,sunCanvas.height);
-    }
-    drawSun();
-    addEventListener('resize', drawSun);
 
     requestAnimationFrame(render);
   }
-  proj=P(Math.PI/3, canvas.width/canvas.height, 0.1, 4000);
-  render();
-// 📱 Nếu là điện thoại thì bật cảm biến xoay
-if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
-  let gyroX = 0, gyroY = 0;
-  window.addEventListener("deviceorientation", (e) => {
-    gyroX = e.beta || 0;   // nghiêng trước–sau
-    gyroY = e.gamma || 0;  // nghiêng trái–phải
-  });
 
-  // 🔁 Cập nhật camera mỗi khung hình
-  const oldRender = render;
-  render = function() {
-    // tính góc nghiêng
-    const tiltX = gyroX / 90;
-    const tiltY = gyroY / 90;
-    // nếu code bạn dùng biến xoay tên khác, sửa lại ở đây
-    mx = tiltY;  
-    my = tiltX;  
-    oldRender();
-  };
-}
+  // start
+  proj=P(Math.PI/3.5, canvas.width/canvas.height, 0.1, 6000);
+  render();
+  // auto-fit khi load lần đầu (mobile)
+  window.dispatchEvent(new Event('resize'));
 })();
 </script>
 </body>
 </html>
-
-
