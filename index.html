@@ -137,36 +137,86 @@
 
   /* ===== Earth full-screen raymarch (real-ish) ===== */
   const earthVS=`attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}`;
-  const earthFS=`precision highp float;
-    uniform vec2 r; uniform float t; uniform vec2 cam; uniform float zoom;
-    const vec3 sunDir = normalize(vec3(1.2, 0.8, 0.4)); // góc phải-trên, dịu
-    float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-    float n2(vec2 p){vec2 i=floor(p),f=fract(p);float a=h(i),b=h(i+vec2(1,0)),c=h(i+vec2(0,1)),d=h(i+vec2(1,1));
-      vec2 u=f*f*(3.-2.*f);return mix(a,b,u.x)+(c-a)*u.y*(1.-u.x)+(d-b)*u.x*u.y;}
-    float fbm(vec2 p){float v=0.,A=.5;for(int i=0;i<5;i++){v+=A*n2(p);p*=2.;A*=.55;}return v;}
-    mat3 rotY(float a){float c=cos(a),s=sin(a);return mat3(c,0.,-s, 0.,1.,0., s,0.,c);}
-    void main(){
-      vec2 uv=(gl_FragCoord.xy/r)-.5; uv.x*=r.x/r.y; uv-=cam*0.08;
-      float scale = mix(1.0, 0.88, clamp(zoom/14.0, 0.0, 1.0)); uv*=scale;
-      vec3 ro=vec3(0.,0.,3.5); vec3 rd=normalize(vec3(uv,-1.2)); float R=0.7;
-      float b=dot(ro,rd), c=dot(ro,ro)-R*R, h2=b*b-c; if(h2<0.0){discard;}
-      float t0=-b-sqrt(max(0.0,h2)); vec3 pos=ro+rd*t0; vec3 N=normalize(pos); N=rotY(t*0.12)*N;
-      float lon=atan(N.z,N.x), lat=asin(N.y); vec2 st=vec2(lon/3.14159, lat/1.5708);
-      float cont=fbm(st*2.4+vec2(0., t*0.02)); float land=smoothstep(0.52,0.60,cont);
-      float clouds=smoothstep(0.58,0.80,fbm(st*6.0+vec2(t*0.05,-t*0.03)));
-      vec3 ocean=vec3(0.05,0.25,0.65), shallow=vec3(0.08,0.45,0.85), ground=vec3(0.22,0.42,0.15), sand=vec3(0.70,0.62,0.35);
-      vec3 base=mix(ocean,shallow,smoothstep(0.0,0.25,fbm(st*3.0)));
-      base = mix(base, mix(ground, sand, fbm(st*5.0)), land);
-      base = mix(base, mix(ground, sand, fbm(st*5.0)), land);
-      vec3 L=normalize(sunDir); float diff=max(dot(N,L),0.0);
-      vec3 sunCol=vec3(0.95,0.80,0.55), amb=vec3(0.06,0.09,0.16);
-      float rim=pow(1.0-max(dot(N,-rd),0.0),2.2); vec3 rimCol=vec3(0.45,0.35,1.0)*rim*0.7;
-      vec3 cloudCol=vec3(1.0)*(0.4+0.6*diff); base=mix(base,cloudCol,clouds*0.55);
-      vec3 col=base*(amb+sunCol*diff*0.85)+rimCol;
-      float night=smoothstep(0.15,0.0,diff); col+=night*vec3(0.9,0.65,0.2)*0.05*fbm(st*10.0);
-      float edge=smoothstep(R*R,R*R*0.92,dot(pos,pos)); col*=mix(1.0,0.86,edge);
-      gl_FragColor=vec4(col,1.0);
-    }`;
+  const earthFS = `#ifdef GL_FRAGMENT_PRECISION_HIGH
+  precision highp float;
+  #else
+  precision mediump float;
+  #endif
+
+  uniform vec2 r;
+  uniform float t;
+  uniform vec2 cam;
+  uniform float zoom;
+  uniform float deviceScale; // 👈 mới thêm
+
+  const vec3 sunDir = normalize(vec3(1.2, 0.8, 0.4)); // góc phải-trên, dịu
+
+  float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+  float n2(vec2 p){vec2 i=floor(p),f=fract(p);
+    float a=h(i),b=h(i+vec2(1,0)),c=h(i+vec2(0,1)),d=h(i+vec2(1,1));
+    vec2 u=f*f*(3.-2.*f);
+    return mix(a,b,u.x)+(c-a)*u.y*(1.-u.x)+(d-b)*u.x*u.y;
+  }
+  float fbm(vec2 p){float v=0.,A=.5;
+    for(int i=0;i<5;i++){v+=A*n2(p);p*=2.;A*=.55;}
+    return v;
+  }
+  mat3 rotY(float a){float c=cos(a),s=sin(a);
+    return mat3(c,0.,-s, 0.,1.,0., s,0.,c);
+  }
+
+  void main(){
+    vec2 uv = (gl_FragCoord.xy / r) - 0.5;
+    uv.x *= r.x / r.y;
+    uv -= cam * 0.08;
+
+    float scale = mix(1.0, 0.80, clamp(zoom / 14.0, 0.0, 1.0));
+    uv *= scale;
+
+    // 👇 PC to, mobile nhỏ
+    vec3 ro = vec3(0., 0., 3.5 + deviceScale);
+    vec3 rd = normalize(vec3(uv, -1.2));
+    float R = 0.65 - (deviceScale * 0.1);
+
+    float b=dot(ro,rd), c=dot(ro,ro)-R*R, h2=b*b-c;
+    if(h2<0.0){discard;}
+    float t0=-b-sqrt(max(0.0,h2));
+    vec3 pos=ro+rd*t0;
+    vec3 N=normalize(pos);
+    N=rotY(t*0.12)*N;
+
+    float lon=atan(N.z,N.x), lat=asin(N.y);
+    vec2 st=vec2(lon/3.14159, lat/1.5708);
+
+    float cont=fbm(st*2.4+vec2(0., t*0.02));
+    float land=smoothstep(0.52,0.60,cont);
+    float clouds=smoothstep(0.58,0.80,fbm(st*6.0+vec2(t*0.05,-t*0.03)));
+
+    vec3 ocean=vec3(0.05,0.25,0.65);
+    vec3 shallow=vec3(0.08,0.45,0.85);
+    vec3 ground=vec3(0.22,0.42,0.15);
+    vec3 sand=vec3(0.70,0.62,0.35);
+
+    vec3 base=mix(ocean,shallow,smoothstep(0.0,0.25,fbm(st*3.0)));
+    base = mix(base, mix(ground, sand, fbm(st*5.0)), land);
+    base = mix(base, mix(ground, sand, fbm(st*5.0)), land);
+
+    vec3 L=normalize(sunDir);
+    float diff=max(dot(N,L),0.0);
+    vec3 sunCol=vec3(0.95,0.80,0.55);
+    vec3 amb=vec3(0.06,0.09,0.16);
+    float rim=pow(1.0-max(dot(N,-rd),0.0),2.2);
+    vec3 rimCol=vec3(0.45,0.35,1.0)*rim*0.7;
+    vec3 cloudCol=vec3(1.0)*(0.4+0.6*diff);
+    base=mix(base,cloudCol,clouds*0.55);
+    vec3 col=base*(amb+sunCol*diff*0.85)+rimCol;
+    float night=smoothstep(0.15,0.0,diff);
+    col+=night*vec3(0.9,0.65,0.2)*0.05*fbm(st*10.0);
+    float edge=smoothstep(R*R,R*R*0.92,dot(pos,pos));
+    col*=mix(1.0,0.86,edge);
+
+    gl_FragColor=vec4(col,1.0);
+  }`;
   const earthP=link(earthVS,earthFS);
   const eB=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,eB);
   gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]),gl.STATIC_DRAW);
@@ -175,6 +225,7 @@
   const eTime=gl.getUniformLocation(earthP,'t');
   const eCam=gl.getUniformLocation(earthP,'cam');
   const eZoom=gl.getUniformLocation(earthP,'zoom');
+  const eDeviceScale = gl.getUniformLocation(earthP,'deviceScale');
 
   /* ===== interaction (mouse + gyro) ===== */
   let proj=P(Math.PI/3, canvas.width/canvas.height, 0.1, 5000);
@@ -284,6 +335,7 @@
     gl.uniform1f(eTime, t);
     gl.uniform2f(eCam, camX*0.06, -camY*0.05);
     gl.uniform1f(eZoom, camZ-54.0);
+	gl.uniform1f(eDeviceScale, isMobile ? 1.2 : 0.0);
     gl.drawArrays(gl.TRIANGLES,0,6);
 
     // Meteors (front)
