@@ -262,7 +262,8 @@
 
   /* ====== camera / interact ====== */
   let proj=P(Math.PI/3, canvas.width/canvas.height, 0.1, 4000);
-  addEventListener('resize', ()=>{ resize(); proj=P(Math.PI/3, canvas.width/canvas.height, 0.1, 4000); });
+  window.dispatchEvent(new Event('resize'));
+  addEventListener('resize', ()=>{ resize(); proj=P(Math.PI/3.5, canvas.width/canvas.height, 0.1, 5000); });
   const target={x:0,y:0}; let scrollZ=0;
   addEventListener('mousemove',e=>{target.x=(e.clientX/innerWidth)*2-1;target.y=(e.clientY/innerHeight)*2-1;},{passive:true});
   addEventListener('wheel',e=>{scrollZ+=e.deltaY*0.0015;scrollZ=Math.max(-2,Math.min(12,scrollZ));},{passive:true});
@@ -357,3 +358,4 @@
 </script>
 </body>
 </html>
+
