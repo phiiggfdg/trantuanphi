@@ -354,8 +354,29 @@
   }
   proj=P(Math.PI/3, canvas.width/canvas.height, 0.1, 4000);
   render();
+// 📱 Nếu là điện thoại thì bật cảm biến xoay
+if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+  let gyroX = 0, gyroY = 0;
+  window.addEventListener("deviceorientation", (e) => {
+    gyroX = e.beta || 0;   // nghiêng trước–sau
+    gyroY = e.gamma || 0;  // nghiêng trái–phải
+  });
+
+  // 🔁 Cập nhật camera mỗi khung hình
+  const oldRender = render;
+  render = function() {
+    // tính góc nghiêng
+    const tiltX = gyroX / 90;
+    const tiltY = gyroY / 90;
+    // nếu code bạn dùng biến xoay tên khác, sửa lại ở đây
+    mx = tiltY;  
+    my = tiltX;  
+    oldRender();
+  };
+}
 })();
 </script>
 </body>
 </html>
+
 
