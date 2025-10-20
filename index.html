@@ -1,229 +1,359 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Giới thiệu - Trần Tuấn Phi</title>
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    :root{
-      --bg:#0e0e0e; --fg:#fff; --card:rgba(255,255,255,.06); --accent:#00ff90;
-    }
-    body{
-      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto;
-      background:var(--bg); color:var(--fg); text-align:center;
-      scroll-behavior:smooth; transition:background .6s,color .6s;
-      overflow-x:hidden;
-    }
-    header{
-      height:50vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
-      background:url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
-      box-shadow:0 0 30px rgba(0,0,0,.7);
-    }
-    header h1{font-size:3.6rem; margin:0; text-shadow:0 0 10px rgba(0,0,0,.9)}
-    header p{opacity:0; margin:6px 0 0; font-size:1.25rem; animation:fadeUp 1s ease .4s forwards}
-    section{
-      width:min(760px,92%); margin:28px auto; background:var(--card);
-      padding:22px; border-radius:14px; box-shadow:0 0 16px rgba(255,255,255,.05); text-align:left;
-      transition:background .6s;
-    }
-    h2{font-size:1.9rem; margin:0 0 16px; padding-bottom:10px;
-       border-bottom:2px solid #555; opacity:0; transform:translateY(16px); transition:all .7s ease;}
-    ul{list-style:none; padding:0; margin:0; font-size:1.22rem; line-height:1.9}
-    li{display:flex; align-items:center; gap:10px; opacity:0; transform:translateY(16px); transition:all .7s ease;}
-    li i{color:var(--accent); width:20px; text-align:center}
-    .text-slot{display:inline-block; min-height:1em}
-    a.social{display:inline-flex; align-items:center; gap:8px; margin-top:14px; font-weight:600; color:#3b5998; text-decoration:none}
-    a.social:hover{color:#6d84b4}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tran Phi — Cosmic Chill V13 (Earthlight Orbit)</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#060312;color:#fff;font-family:system-ui,Segoe UI,Roboto,Arial}
+  .ui{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none}
+  h1{margin:0;font-size:clamp(36px,7vw,84px);letter-spacing:.4px;opacity:.95;
+     text-shadow:0 0 20px rgba(106,0,255,.45),0 0 40px rgba(0,175,255,.20)}
+  p{margin:.4rem 0 0;color:#cfe3ffcc}
+  .links{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:10px;pointer-events:auto}
+  .btn{padding:10px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.18);color:#fff;text-decoration:none;
+       background:rgba(255,255,255,.06);transition:.25s}
+  .btn:hover{background:linear-gradient(90deg,#6a00ff,#00afff,#ffb6e9);border-color:transparent}
+  .hint{position:fixed;left:12px;bottom:10px;color:#9fb0ff80;font-size:12px}
+  #sun {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+</style>
 
-    .code-wrap{position:relative}
-    pre{
-      background:#1e1e1e; color:#00ff90; font-family:ui-monospace,Consolas,monospace; font-size:.85rem;
-      padding:18px; border-radius:12px; min-height:220px; white-space:pre-wrap; overflow-x:auto;
-      opacity:0; transform:translateY(16px); transition:all .7s ease; box-shadow:0 0 12px rgba(0,255,144,.25);
-    }
-    .copy-btn{
-      position:absolute; right:10px; top:10px; border:0; padding:6px 12px; border-radius:8px;
-      background:rgba(0,255,144,.2); color:var(--accent); cursor:pointer; font-weight:600;
-      transition:background .25s, transform .25s;
-    }
-    .copy-btn:hover{background:rgba(0,255,144,.38); transform:scale(1.05)}
-
-    .guide{margin-top:12px; background:rgba(255,255,255,.05); padding:14px; border-radius:10px; font-size:.95rem;
-      opacity:0; transform:translateY(16px); transition:all .7s ease;}
-
-    /* Nút chức năng */
-    .controls{
-      position:fixed; bottom:20px; right:20px; display:flex; flex-direction:column; gap:10px; z-index:5;
-    }
-    .ctrl-btn{
-      background:rgba(255,255,255,0.1); color:var(--fg);
-      border:1px solid rgba(255,255,255,.3); border-radius:10px;
-      padding:10px; font-size:1.2rem; cursor:pointer;
-      backdrop-filter:blur(6px);
-      transition:background .4s,transform .3s,color .4s;
-    }
-    .ctrl-btn:hover{background:rgba(255,255,255,.3); transform:scale(1.1)}
-
-    .visible{opacity:1 !important; transform:translateY(0) !important}
-    @keyframes fadeUp{from{opacity:0; transform:translateY(18px)} to{opacity:1; transform:translateY(0)}}
-
-    canvas#fallingCanvas{
-      position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none;
-      z-index:1;
-      transition:opacity 0.6s;
-    }
-    header,section,footer{position:relative; z-index:2}
-  </style>
 </head>
 <body>
-  <canvas id="fallingCanvas"></canvas>
+<canvas id="gl"></canvas>
+<canvas id="sun"></canvas>
 
-  <!-- Nút điều khiển -->
-  <div class="controls">
-    <button class="ctrl-btn" id="toggleEffect"><i class="fa-solid fa-pause"></i></button>
-    <button class="ctrl-btn" id="switchEffect"><i class="fa-solid fa-seedling"></i></button>
-    <button class="ctrl-btn" id="toggleTheme"><i class="fa-solid fa-moon"></i></button>
+<div class="ui">
+  <div style="text-align:center;pointer-events:none">
+    <h1>Tran Phi</h1>
+    <p>Thích code cây, cỏ, hoa lá</p>
   </div>
+</div>
+<div class="links">
+  <a class="btn" href="https://www.facebook.com/share/1G2ggLr4KV/" target="_blank" rel="noopener">Facebook</a>
+  <a class="btn" href="https://www.tiktok.com/@phitran111e?_t=ZS-90iLGVfBWBI&_r=1" target="_blank" rel="noopener">TikTok</a>
+</div>
+<div class="hint">Di chuột để lia, lăn chuột để dolly • V13: Earthlight Orbit</div>
 
-  <header>
-    <h1>Trần Tuấn Phi</h1>
-    <p>Lập trình • Cây cỏ • Hoa lá</p>
-  </header>
+<script>
+(function(){
+  const canvas = document.getElementById('gl');
+  const gl = canvas.getContext('webgl', {antialias:true, alpha:false, premultipliedAlpha:false});
+  if(!gl){ alert('WebGL không khả dụng'); return; }
 
-  <section>
-    <h2 class="reveal">Giới thiệu</h2>
-    <ul>
-      <li class="reveal typing" data-text="Tên: Trần Tuấn Phi">
-        <i class="fa-solid fa-user"></i><span class="text-slot"></span>
-      </li>
-      <li class="reveal typing" data-text="Sở thích: Code, cây, cỏ, hoa, lá">
-        <i class="fa-solid fa-heart"></i><span class="text-slot"></span>
-      </li>
-      <li class="reveal typing" data-text="Email: phihhhhhhhhhh@gmail.com">
-        <i class="fa-solid fa-envelope"></i><span class="text-slot"></span>
-      </li>
-    </ul>
-    <a class="social reveal" href="https://www.facebook.com/share/1PB6MyWcrk/" target="_blank" rel="noopener">
-      <i class="fa-brands fa-facebook"></i> Facebook của tôi
-    </a>
-  </section>
+  /* ====== resize ====== */
+  function resize(){
+    const dpr = Math.min(2, window.devicePixelRatio||1);
+    const w = Math.floor(innerWidth*dpr), h = Math.floor(innerHeight*dpr);
+    if(canvas.width!==w || canvas.height!==h){ canvas.width=w; canvas.height=h; gl.viewport(0,0,w,h); }
+  }
+  resize(); addEventListener('resize', resize);
 
-  <section>
-    <h2 class="reveal">Mã nguồn trang</h2>
-    <div class="code-wrap">
-      <pre id="code-block" class="reveal"></pre>
-      <button class="copy-btn" id="copy-btn"><i class="fa-solid fa-copy"></i> Copy</button>
-    </div>
-    <div class="guide reveal">
-      <b>Hướng dẫn chỉnh sửa nhanh:</b><br/>
-      • Ảnh bìa: sửa URL trong <code>header{ background:url(...) }</code><br/>
-      • Tên/Sở thích/Email: đổi nội dung ở <code>data-text</code><br/>
-      • Màu nhấn: đổi biến <code>--accent</code><br/>
-      • Thêm mạng xã hội: thêm thẻ <code>&lt;a class="social"&gt;</code>
-    </div>
-  </section>
+  /* ====== tiny mat ====== */
+  const I=()=>[1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1];
+  const M=(a,b)=>{const o=new Array(16);for(let r=0;r<4;r++)for(let c=0;c<4;c++)o[r*4+c]=a[r*4+0]*b[c+0]+a[r*4+1]*b[c+4]+a[r*4+2]*b[c+8]+a[r*4+3]*b[c+12];return o;}
+  const P=(fov,asp,n,f)=>{const t=1/Math.tan(fov/2),nf=1/(n-f);return[t/asp,0,0,0, 0,t,0,0, 0,0,(f+n)*nf,-1, 0,0,(2*f*n)*nf,0];}
+  const RX=a=>{const c=Math.cos(a),s=Math.sin(a);return[1,0,0,0, 0,c,s,0, 0,-s,c,0, 0,0,0,1];};
+  const RY=a=>{const c=Math.cos(a),s=Math.sin(a);return[c,0,-s,0, 0,1,0,0, s,0,c,0, 0,0,0,1];};
+  const RZ=a=>{const c=Math.cos(a),s=Math.sin(a);return[c,s,0,0, -s,c,0,0, 0,0,1,0, 0,0,0,1];};
+  const T=(x,y,z)=>{const m=I();m[12]=x;m[13]=y;m[14]=z;return m;}
 
-  <footer style="text-align:center; color:#aaa; padding:16px 0; margin:20px 0 6px">
-    © 2025 - Trang cá nhân được tạo bởi Trần Tuấn Phi
-  </footer>
+  /* ====== compile/link ====== */
+  function compile(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);
+    if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){console.error(gl.getShaderInfoLog(s));throw Error('shader');}return s;}
+  function link(vs,fs){const p=gl.createProgram();gl.attachShader(p,compile(gl.VERTEX_SHADER,vs));gl.attachShader(p,compile(gl.FRAGMENT_SHADER,fs));gl.linkProgram(p);
+    if(!gl.getProgramParameter(p,gl.LINK_STATUS)){console.error(gl.getProgramInfoLog(p));throw Error('program');}return p;}
 
-  <script>
-    /* IntersectionObserver cho reveal */
-    const io=new IntersectionObserver((entries)=>{
-      entries.forEach(e=>{
-        if(!e.isIntersecting)return;
-        const el=e.target;
-        el.classList.add('visible');
-        if(el.classList.contains('typing') && !el.dataset.done){
-          el.dataset.done='1';
-          const target=el.querySelector('.text-slot');
-          const txt=el.dataset.text;
-          let i=0;
-          (function type(){
-            if(i<=txt.length){target.textContent=txt.slice(0,i++); setTimeout(type,45);}
-          })();
-        }
-        if(el.id==="code-block" && !el.dataset.done){
-          el.dataset.done='1'; typeWholeSource(el);
-        }
-        io.unobserve(el);
-      });
-    },{threshold:0.15});
-    document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  /* ====== Nebula background (deep) ====== */
+  const nebVS=`attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}`;
+  const nebFS=`precision highp float;uniform vec2 r;uniform float t;
+    float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+    float n2(vec2 p){vec2 i=floor(p),f=fract(p);float a=h(i),b=h(i+vec2(1,0)),c=h(i+vec2(0,1)),d=h(i+vec2(1,1));
+      vec2 u=f*f*(3.-2.*f);return mix(a,b,u.x)+(c-a)*u.y*(1.-u.x)+(d-b)*u.x*u.y;}
+    float fbm(vec2 p){float v=0.,A=.5;for(int i=0;i<5;i++){v+=A*n2(p);p*=2.;A*=.55;}return v;}
+    void main(){vec2 uv=(gl_FragCoord.xy/r)-.5;uv.x*=r.x/r.y;float tt=t*.02;float R=length(uv);
+      float ang=atan(uv.y,uv.x)+tt*.6;vec2 q=vec2(cos(ang),sin(ang))*R*1.5;
+      float n=fbm(q*1.6+vec2(tt*.6,-tt*.4));
+      vec3 pu=vec3(.35,.10,.80), cy=vec3(0.,.70,1.), pk=vec3(1.,.72,.90);
+      vec3 col=mix(pu,cy,smoothstep(.2,.7,n)); col=mix(col,pk,smoothstep(.6,.95,n));
+      float vg=smoothstep(.95,.2,R); col*=vg*.42; gl_FragColor=vec4(col,1.); }`;
+  const nebP=link(nebVS,nebFS);
+  const nebB=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,nebB);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]),gl.STATIC_DRAW);
+  const nebAL=gl.getAttribLocation(nebP,'a'), nebRL=gl.getUniformLocation(nebP,'r'), nebTL=gl.getUniformLocation(nebP,'t');
 
-    const PAGE_SOURCE='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
-    function typeWholeSource(pre){
-      let i=0;(function t(){if(i<PAGE_SOURCE.length){pre.textContent+=PAGE_SOURCE.charAt(i++); setTimeout(t,2);} })();
+  /* ====== Points program (stars / galaxy / meteors) ====== */
+  const ptVS=`attribute vec3 p;attribute float s;attribute vec3 c;uniform mat4 pr,vi,mo;varying vec3 vc;
+  void main(){vc=c;gl_Position=pr*vi*mo*vec4(p,1.);gl_PointSize=s;}`;
+  const ptFS=`precision mediump float;varying vec3 vc;
+  void main(){vec2 uv=gl_PointCoord*2.-1.;float d=dot(uv,uv);float a=smoothstep(1.,0.,d);gl_FragColor=vec4(vc,a);}`;
+  const ptP=link(ptVS,ptFS);
+  const aPos=gl.getAttribLocation(ptP,'p'), aSize=gl.getAttribLocation(ptP,'s'), aCol=gl.getAttribLocation(ptP,'c');
+  const uPr=gl.getUniformLocation(ptP,'pr'), uVi=gl.getUniformLocation(ptP,'vi'), uMo=gl.getUniformLocation(ptP,'mo');
+  function mkBuf(n){return{pos:gl.createBuffer(),col:gl.createBuffer(),siz:gl.createBuffer(),count:n};}
+  function fill(buf,arr,nc,loc){gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,arr,gl.DYNAMIC_DRAW);gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,nc,gl.FLOAT,false,0,0);}
+
+  // stars deep layers
+  function starLayer(n,spread,size,tint){const pos=new Float32Array(n*3),col=new Float32Array(n*3),siz=new Float32Array(n);
+    for(let i=0;i<n;i++){const ix=i*3;
+      pos[ix]=(Math.random()-.5)*spread; pos[ix+1]=(Math.random()-.5)*spread*.6; pos[ix+2]=(Math.random()-.5)*spread;
+      const m=Math.random()*0.2; const r=1-m+m*tint[0], g=1-m+m*tint[1], b=1-m+m*tint[2];
+      col[ix]=r; col[ix+1]=g; col[ix+2]=b; siz[i]=size*(.85+Math.random()*.5);}
+    const b=mkBuf(n); b._pos=pos; b._col=col; b._siz=siz; b.count=n; return b;}
+  const starsFar = starLayer(3200,1600,2.0,[0.68,0.91,1.00]);
+  const starsMid = starLayer(2000,1100,2.6,[0.84,0.78,1.00]);
+  const starsNear= starLayer(1000, 800,3.2,[1.00,0.72,0.91]);
+
+  // spiral galaxy (background)
+  function spiral(n=3400,radius=140,arms=3,spin=1.6,thick=7){
+    const pos=new Float32Array(n*3),col=new Float32Array(n*3),siz=new Float32Array(n);
+    for(let i=0;i<n;i++){const ix=i*3; const arm=Math.floor(Math.random()*arms);
+      const r=Math.pow(Math.random(),0.35)*radius; const base=arm*(2*Math.PI/arms);
+      const ang=base+r*spin+(Math.random()-.5)*.4; const y=(Math.random()-.5)*thick*Math.pow(1-r/radius,0.5);
+      pos[ix]=Math.cos(ang)*r; pos[ix+1]=y; pos[ix+2]=Math.sin(ang)*r;
+      const p=[0.84,0.78,1.0], c=[0.68,0.91,1.0], h=[1.00,0.72,0.91];
+      const m1=Math.random()*0.5, m2=Math.random()*0.25;
+      let rr=(1-m1)*1+m1*p[0]; rr=(1-m2)*rr+m2*h[0];
+      let gg=(1-m1)*1+m1*p[1]; gg=(1-m2)*gg+m2*h[1];
+      let bb=(1-m1)*1+m1*p[2]; bb=(1-m2)*bb+m2*h[2];
+      col[ix]=rr*.9; col[ix+1]=gg*.9; col[ix+2]=bb*.9;
+      siz[i]=1.7;
     }
-    document.getElementById('copy-btn').addEventListener('click',()=>{
-      navigator.clipboard.writeText(PAGE_SOURCE).then(()=>{
-        const btn=document.getElementById('copy-btn');
-        const old=btn.innerHTML;
-        btn.innerHTML='<i class="fa-solid fa-check"></i> Copied!';
-        setTimeout(()=>btn.innerHTML=old,1200);
-      });
-    });
+    const b=mkBuf(n); b._pos=pos; b._col=col; b._siz=siz; b.count=n; b._tilt=62*Math.PI/180; return b;
+  }
+  const bgGalaxy = spiral();
 
-    /* Hiệu ứng rơi */
-    const canvas=document.getElementById('fallingCanvas');
-    const ctx=canvas.getContext('2d');
-    let particles=[]; let running=true; let mode='sakura';
-    function resize(){canvas.width=innerWidth; canvas.height=innerHeight;}
-    window.addEventListener('resize',resize); resize();
-    function createParticles(){
-      particles=[];
-      for(let i=0;i<25;i++){
-        particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,
-                        r:6+Math.random()*6,speed:1+Math.random()*2,drift:Math.random()*2});
+  // meteors (slow, long tail)
+  const MET_TAIL=80, MAX_MET=3; const mPos=new Float32Array(MET_TAIL*MAX_MET*3), mCol=new Float32Array(MET_TAIL*MAX_MET*3), mSize=new Float32Array(MET_TAIL*MAX_MET);
+  const meteors=mkBuf(MET_TAIL*MAX_MET); let act=[];
+  function spawnMeteor(){
+    if(act.length>=MAX_MET) return;
+    const side=Math.random()<0.5?-1:1;
+    const x= side*(120+Math.random()*40), y=(Math.random()-.5)*60, z=-120-Math.random()*40;
+    const sp=0.28+Math.random()*0.18, vx=-side*sp, vy=(Math.random()-.5)*0.06, vz=(0.65+Math.random()*0.2)*sp;
+    act.push({x,y,z,vx,vy,vz,life:0,ttl:6+Math.random()*6});
+  }
+  spawnMeteor();
+
+  // upload static once
+  [starsFar,starsMid,starsNear,bgGalaxy].forEach(b=>{
+    b.pos=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,b.pos); gl.bufferData(gl.ARRAY_BUFFER,b._pos,gl.STATIC_DRAW);
+    b.col=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,b.col); gl.bufferData(gl.ARRAY_BUFFER,b._col,gl.STATIC_DRAW);
+    b.siz=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,b.siz); gl.bufferData(gl.ARRAY_BUFFER,b._siz,gl.STATIC_DRAW);
+  });
+  meteors.pos=gl.createBuffer(); meteors.col=gl.createBuffer(); meteors.siz=gl.createBuffer();
+
+
+  /* ====== EARTH (real-ish) — full-screen shader that draws a sphere ====== */
+  const earthVS=`attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}`;
+  const earthFS=`precision highp float;
+    uniform vec2 r; uniform float t; uniform vec2 cam; uniform float zoom;
+    // light from top-right (warm)
+	const vec3 sunPos = vec3(2.5, 1.8, 3.0);
+	vec3 L = normalize(sunPos);  // thay cho lightDir
+    const vec3 lightDir = normalize(vec3(1.2, 0.8, 0.4));
+    // hash/noise/fbm to fake continents & clouds
+    float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+    float n2(vec2 p){vec2 i=floor(p),f=fract(p);float a=h(i),b=h(i+vec2(1,0)),c=h(i+vec2(0,1)),d=h(i+vec2(1,1));
+      vec2 u=f*f*(3.-2.*f);return mix(a,b,u.x)+(c-a)*u.y*(1.-u.x)+(d-b)*u.x*u.y;}
+    float fbm(vec2 p){float v=0.,A=.5;for(int i=0;i<5;i++){v+=A*n2(p);p*=2.;A*=.55;}return v;}
+
+    // rotate around Y
+    mat3 rotY(float a){float c=cos(a),s=sin(a);return mat3(c,0.,-s, 0.,1.,0., s,0.,c);}
+
+    void main(){
+      vec2 uv = (gl_FragCoord.xy/r) - .5;
+      uv.x *= r.x/r.y;
+
+      // camera parallax & zoom
+      uv -= cam*0.08;
+      float scale = mix(1.0, 0.88, clamp(zoom/14.0, 0.0, 1.0));
+      uv *= scale;
+
+      // sphere setup
+      vec3 ro = vec3(0., 0., 3.5);          // camera
+      vec3 rd = normalize(vec3(uv, -1.5));  // ray
+      float R = 0.6;                        // earth radius
+      // intersect ray-sphere (center at origin)
+      float b = dot(ro, rd);
+      float c = dot(ro, ro) - R*R;
+      float h2 = b*b - c;
+      if(h2 < 0.0){ discard; }              // miss the sphere
+      float t0 = -b - sqrt(max(0.0,h2));    // nearest hit
+      vec3 pos = ro + rd * t0;              // hit point in world
+      vec3 N = normalize(pos);              // normal
+
+      // spin earth (slow)
+      float spin = t*0.12;                  // 1B: chậm vừa
+      N = rotY(spin) * N;
+
+      // lat/long for continents procedural
+      float lon = atan(N.z, N.x);           // [-pi, pi]
+      float lat = asin(N.y);                // [-pi/2, pi/2]
+      vec2 st = vec2(lon/3.14159, lat/1.5708);  // [-1..1]
+      // continents: threshold fbm to get land vs ocean
+      float cont = fbm(st*2.4 + vec2(0.0, t*0.02));
+      float land = smoothstep(0.52, 0.60, cont); // land mask
+      // clouds (soft, moving)
+      float clouds = smoothstep(0.58, 0.80, fbm(st*6.0 + vec2(t*0.05, -t*0.03)));
+
+      // base colors
+      vec3 ocean = vec3(0.05, 0.25, 0.65);
+      vec3 shallow = vec3(0.08, 0.45, 0.85);
+      vec3 ground = vec3(0.22, 0.42, 0.15);
+      vec3 sand   = vec3(0.70, 0.62, 0.35);
+
+      vec3 base = mix(ocean, shallow, smoothstep(0.0, 0.25, fbm(st*3.0))); // ocean variation
+      base = mix(base, mix(ground, sand, fbm(st*5.0)), land);
+
+      // lighting (sun warm – from top-right)
+      vec3 L = normalize(lightDir);
+      float diff = max(dot(N, L), 0.0);
+      // warm sunlight color
+      vec3 sunCol = vec3(0.95, 0.8, 0.55);
+      // ambient deep space
+      vec3 ambCol = vec3(0.06, 0.09, 0.16);
+
+      // rim light (atmospheric)
+      float rim = pow(1.0 - max(dot(N, -rd), 0.0), 2.2);
+      vec3 rimCol = vec3(0.45, 0.35, 1.0) * rim * 0.7;
+
+      // clouds on top, lit by sun
+      vec3 cloudCol = vec3(1.0) * (0.4 + 0.6*diff);
+      base = mix(base, cloudCol, clouds*0.55);
+
+      vec3 col = base * (ambCol + sunCol * diff * 0.85) + rimCol;
+
+      // night side subtle city glow (very faint, warm)
+      float night = smoothstep(0.15, 0.0, diff);
+      col += night * vec3(0.9, 0.65, 0.2) * 0.05 * fbm(st*10.0);
+
+      // slight vignette toward edge of sphere
+      float edge = smoothstep(R*R, R*R*0.92, dot(pos,pos));
+      col *= mix(1.0, 0.85, edge);
+
+      gl_FragColor = vec4(col, 1.0);
+    }`;
+  const earthP=link(earthVS,earthFS);
+  const eB=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,eB);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]),gl.STATIC_DRAW);
+  const eAL=gl.getAttribLocation(earthP,'a');
+  const eRes=gl.getUniformLocation(earthP,'r');
+  const eTime=gl.getUniformLocation(earthP,'t');
+  const eCam=gl.getUniformLocation(earthP,'cam');
+  const eZoom=gl.getUniformLocation(earthP,'zoom');
+
+  /* ====== helpers ====== */
+  function drawPoints(buf, view, model){
+    gl.useProgram(ptP);
+    gl.uniformMatrix4fv(uPr,false,proj);
+    gl.uniformMatrix4fv(uVi,false,view);
+    gl.uniformMatrix4fv(uMo,false,model);
+    fill(buf.pos, buf._pos || buf._dynPos, 3, aPos);
+    fill(buf.col, buf._col || buf._dynCol, 3, aCol);
+    fill(buf.siz, buf._siz || buf._dynSize,1, aSize);
+    gl.drawArrays(gl.POINTS,0,buf.count);
+  }
+
+  /* ====== camera / interact ====== */
+  let proj=P(Math.PI/3, canvas.width/canvas.height, 0.1, 4000);
+  addEventListener('resize', ()=>{ resize(); proj=P(Math.PI/3, canvas.width/canvas.height, 0.1, 4000); });
+  const target={x:0,y:0}; let scrollZ=0;
+  addEventListener('mousemove',e=>{target.x=(e.clientX/innerWidth)*2-1;target.y=(e.clientY/innerHeight)*2-1;},{passive:true});
+  addEventListener('wheel',e=>{scrollZ+=e.deltaY*0.0015;scrollZ=Math.max(-2,Math.min(12,scrollZ));},{passive:true});
+
+  // upload star / galaxy buffers once
+  [starsFar,starsMid,starsNear,bgGalaxy].forEach(b=>{
+    // already filled above
+  });
+  meteors.pos=gl.createBuffer(); meteors.col=gl.createBuffer(); meteors.siz=gl.createBuffer();
+
+  /* ====== loop ====== */
+  let camX=0, camY=0, camZ=54, t=0, spawnT=0;
+  gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE); // additive for glow points
+  function render(){
+    t+=0.016; spawnT+=0.016;
+
+    // 1) Deep nebula
+    gl.useProgram(nebP);
+    gl.bindBuffer(gl.ARRAY_BUFFER,nebB); gl.enableVertexAttribArray(nebAL); gl.vertexAttribPointer(nebAL,2,gl.FLOAT,false,0,0);
+    gl.uniform2f(nebRL,canvas.width,canvas.height); gl.uniform1f(nebTL,t);
+    gl.drawArrays(gl.TRIANGLES,0,6);
+
+    // camera parallax
+    camX+=(target.x*2.0 - camX)*0.06;
+    camY+=(-(target.y)*1.6 - camY)*0.06;
+    camZ+=(54+scrollZ - camZ)*0.08;
+    const view=T(-camX,-camY,-camZ);
+
+    // 2) background stars + spiral (behind Earth)
+    const mFar=RY(t*0.015), mMid=RY(t*0.035), mNear=RY(t*0.07);
+    let mBG=RY(t*0.015); mBG=M(RZ(0.00012*t*60),mBG); mBG=M(RX(62*Math.PI/180),mBG);
+    drawPoints(starsFar, view, mFar);
+    drawPoints(starsMid, view, mMid);
+    drawPoints(starsNear, view, mNear);
+    drawPoints(bgGalaxy, view, mBG);
+
+    // 3) EARTH (drawn in screen space with correct light)
+    gl.useProgram(earthP);
+    gl.bindBuffer(gl.ARRAY_BUFFER,eB); gl.enableVertexAttribArray(eAL); gl.vertexAttribPointer(eAL,2,gl.FLOAT,false,0,0);
+    gl.uniform2f(eRes, canvas.width, canvas.height);
+    gl.uniform1f(eTime, t);
+    gl.uniform2f(eCam, camX*0.06, camY*0.05); // parallax nhẹ
+    gl.uniform1f(eZoom, camZ-54.0);
+    gl.drawArrays(gl.TRIANGLES,0,6);
+
+    // 4) Meteors (front-most)
+    if(spawnT > (5 + Math.random()*7)){ spawnT=0; spawnMeteor(); }
+    let idx=0; const warmH=[1.0,0.9,0.7], warmT=[1.0,0.55,0.2];
+    for(let m=0;m<act.length;m++){
+      const me=act[m]; me.life+=0.016; me.x+=me.vx; me.y+=me.vy; me.z+=me.vz;
+      if(me.life>me.ttl || me.z>140 || Math.abs(me.x)>140 || Math.abs(me.y)>100){ act.splice(m,1); m--; continue; }
+      for(let k=0;k<MET_TAIL;k++){
+        const fade=k/(MET_TAIL-1);
+        mPos[idx*3  ]=me.x - me.vx*2.2*k;
+        mPos[idx*3+1]=me.y - me.vy*2.2*k;
+        mPos[idx*3+2]=me.z - me.vz*2.2*k;
+        const mix=1.0-fade;
+        mCol[idx*3  ]= warmT[0]*(1-fade) + warmH[0]*mix*0.6;
+        mCol[idx*3+1]= warmT[1]*(1-fade) + warmH[1]*mix*0.6;
+        mCol[idx*3+2]= warmT[2]*(1-fade) + warmH[2]*mix*0.6;
+        mSize[idx]=3.5*(1.0 - fade*0.95);
+        idx++;
       }
-    } createParticles();
-    function draw(){
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      particles.forEach(p=>{
-        ctx.beginPath();
-        ctx.fillStyle=(mode==='sakura')?'rgba(255,182,193,0.85)':'rgba(34,139,34,0.85)';
-        ctx.ellipse(p.x,p.y,p.r,p.r/1.5,0,0,Math.PI*2);
-        ctx.fill();
-        p.y+=p.speed; p.x+=Math.sin(p.y/30)*p.drift;
-        if(p.y>canvas.height){p.y=-10;p.x=Math.random()*canvas.width;}
-      });
-      if(running) requestAnimationFrame(draw);
     }
-    draw();
+    meteors.count=idx; meteors._dynPos=mPos.subarray(0,idx*3); meteors._dynCol=mCol.subarray(0,idx*3); meteors._dynSize=mSize.subarray(0,idx);
+    drawPoints(meteors, view, I());
+    // === Mặt trời overlay ===
+    const sunCanvas = document.getElementById('sun');
+    const sunCtx = sunCanvas.getContext('2d');
 
-    /* Nút điều khiển */
-    const toggleEffect=document.getElementById('toggleEffect');
-    toggleEffect.addEventListener('click',()=>{
-      running=!running;
-      toggleEffect.innerHTML=running?'<i class="fa-solid fa-pause"></i>':'<i class="fa-solid fa-play"></i>';
-      if(running){draw(); canvas.style.opacity=1;} else {canvas.style.opacity=0;}
-    });
+    function drawSun(){
+      sunCanvas.width = innerWidth;
+      sunCanvas.height = innerHeight;
+      sunCtx.clearRect(0,0,sunCanvas.width,sunCanvas.height);
+      const sunX = sunCanvas.width * 0.88;
+      const sunY = sunCanvas.height * 0.15;
+      const g = sunCtx.createRadialGradient(sunX,sunY,0,sunX,sunY,120);
+      g.addColorStop(0,"rgba(255,220,120,1)");
+      g.addColorStop(0.5,"rgba(255,180,80,0.6)");
+      g.addColorStop(1,"rgba(255,150,50,0)");
+      sunCtx.fillStyle = g;
+      sunCtx.fillRect(0,0,sunCanvas.width,sunCanvas.height);
+    }
+    drawSun();
+    addEventListener('resize', drawSun);
 
-    const switchEffect=document.getElementById('switchEffect');
-    switchEffect.addEventListener('click',()=>{
-      mode=(mode==='sakura')?'leaf':'sakura';
-      switchEffect.innerHTML=mode==='sakura'
-        ?'<i class="fa-solid fa-seedling"></i>'
-        :'<i class="fa-solid fa-spa"></i>';
-    });
-
-    const toggleTheme=document.getElementById('toggleTheme');
-    toggleTheme.addEventListener('click',()=>{
-      document.body.classList.toggle('light-mode');
-      if(document.body.classList.contains('light-mode')){
-        document.documentElement.style.setProperty('--bg','#f5f5f5');
-        document.documentElement.style.setProperty('--fg','#222');
-        document.documentElement.style.setProperty('--card','rgba(0,0,0,0.05)');
-        toggleTheme.innerHTML='<i class="fa-solid fa-moon"></i>';
-      } else {
-        document.documentElement.style.setProperty('--bg','#0e0e0e');
-        document.documentElement.style.setProperty('--fg','#fff');
-        document.documentElement.style.setProperty('--card','rgba(255,255,255,0.06)');
-        toggleTheme.innerHTML='<i class="fa-solid fa-sun"></i>';
-      }
-    });
-  </script>
+    requestAnimationFrame(render);
+  }
+  proj=P(Math.PI/3, canvas.width/canvas.height, 0.1, 4000);
+  render();
+})();
+</script>
 </body>
 </html>
